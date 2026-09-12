@@ -1,23 +1,33 @@
-> **다국어 공개 안내:** 본 문서는 동일 내용의 한/영 이중 공개 문서입니다. v3.2.4 2026-09-06 (영문: [README_EN.md](README_EN.md))  
+> **다국어 공개 안내:** 본 문서는 동일 내용의 한/영 이중 공개 문서입니다. v3.4 2026-09-13 (영문: [README_EN.md](README_EN.md))  
 > **Original Authority Notice:** 본 기술 명세의 법적·공학적 판단 최상위 기준은 한글 원본(`README.ko.md`)에 귀속되며, 영문본은 보조 참조용으로만 기능한다. (PHILOSOPHY.ko.md is authoritative original)
 
-# ARCHITECTURE_STRATEGY.md — 구현 수단 무관 범용 조립형 생존 아키텍처 (v3.2.4 Master)
+# ARCHITECTURE_STRATEGY.md — 구현 수단 무관 범용 조립형 생존 아키텍처 (v3.4 Master)
 
 > 본 문서는 특정 기업이나 특정 브랜드를 배제하고, 구현 수단이나 제어 주체와 무관하게 시스템 생존성과 경제성을 동시에 확보하기 위한 **물리적·논리적 범용 조립 방식(Modular Architecture)**의 구조적 차이와 표준화 논리를 다룹니다.  
 > 본 문서는 CC BY 4.0 및 DPL v1.0으로 공개되며, 방어적 공개(Defensive Publication)를 목적으로 합니다.
 
 ---
 
-## 1. 두 가지 반도체 조립 방식 비교
+## 0. 설계자 독자 아키텍처 및 선행기술 공개 선언 (Designer's Philosophical Declaration)
 
-* **단일형 (Single-Die Integration)**
-  * **구조** — 하나의 거대한 다이(Die)에 모든 연산 및 제어 블록을 통합하여 제조하는 방식입니다.
-  * **특징** — 초기 제조 단가가 비교적 저렴하며, 블록 간 내부 배선 구조가 단순합니다.
-  * **제약** — 특정 연산 영역에 단일 결함이 발생할 경우 전체 시스템 부하 및 폐기 위험이 존재하며, 영역별 전원 및 보안 격리에 한계가 존재합니다.
+1. **설계 철학 및 기술 조합의 독자성 (Architectural Conception):**  
+   본 아키텍처 규격은 단일 장애점(Single Point of Failure)에 의한 시스템 전체 마비를 방지하고, 반도체·소프트웨어·물리 인프라 전반에서 무중단 자가치유(Self-Healing) 및 다층 제어를 달성하고자 하는 **설계자(deundeuni)의 독자적 철학과 문제 의식**에서 출발하였다. 모듈 분리, TL Bridge 격리, 다층 제어 토폴로지 및 0.1ms 국소 선조치 파라미터를 통합·정립한 아키텍처 결정권은 설계자 자연인에게 있다.
 
-* **조립형 (Chiplet / Modular Integration)**
-  * **구조** — 기능별로 분리된 개별 칩렛(블록)들을 패브릭 Interconnect로 상호 연결하는 방식입니다.
-  * **특징** — 특정 블록에 장애가 발생해도 해당 영역만 격리하고 인접, 개별, 팀, 중간 관리자, 또는 중앙 지정 예비 블록으로 바통을 넘기는 자가치유를 지향합니다. 전원, 클럭, 보안 영역을 블록 단위로 독립화할 수 있습니다.
+2. **소프트웨어 유틸리티 활용에 관한 명시 (Software Utility Limitation):**  
+   본 문서 작성 과정에서 활용된 소프트웨어 및 AI 도구는 설계자가 이미 정의한 아키텍처 로직, 제어 토폴로지, 구조적 범주를 바탕으로 단순 포맷팅, 문맥 정제, 개념 시각화 출력을 실행한 **수동적 실행 유틸리티(Passive Execution Utility)**에 국한된다. 본 아키텍처의 모든 설계 의도, 구조적 결합권, 선행기술 공개 권한은 전적으로 설계자 자연인에게 귀속된다.
+
+---
+
+## 1. 두 가지 모듈 및 연산 블록 조립 방식 비교
+
+* **단일 통합형 (Single-Die / Monolithic Integration)**
+  * **구조** — 하나의 단일 구역(Die/Monolith)에 모든 연산, 제어 및 물리 블록을 통합하여 구성하는 방식입니다.
+  * **특징** — 초기 제조 및 구동 단가가 비교적 저렴하며, 블록 간 내부 배선 및 인터페이스 구조가 단순합니다.
+  * **제약** — 특정 영역에 단일 결함이 발생할 경우 전체 시스템 부하 및 전면 마비 위험이 존재하며, 영역별 전원 및 보안 격리에 한계가 존재합니다.
+
+* **조립 분리형 (Chiplet / Modular Integration)**
+  * **구조** — 기능별로 분리된 개별 칩렛·소프트웨어 모듈·물리 블록들을 패브릭 Interconnect 및 표준 인터페이스로 상호 연결하는 방식입니다.
+  * **특징** — 특정 블록에 장애가 발생해도 해당 영역만 독자 격리하고 인접, 개별, 팀, 중간 관리자, 또는 중앙 지정 예비 블록으로 바통을 넘기는 자가치유를 지향합니다. 전원, 클럭, 보안, 물리적 제어 영역을 블록 단위로 독립화할 수 있습니다.
   * **제약** — 블록 간을 연결하는 브리지(TL Bridge) 인터페이스와 복잡한 물리·소프트웨어 제어 설계가 요구됩니다.
 
 ---
@@ -26,17 +36,17 @@
 
 두 방식은 우열의 문제가 아닌, **운용 목적과 적용 환경의 차이**에 따라 병행됩니다.
 
-* **보급 및 비용 검증 트랙 (단일형)** — 단가 절감 및 일괄 제조 수율 검증을 위해 활용됩니다.
-* **생존 및 보안 현장 트랙 (조립형)** — 데이터 센터, 자율주행, 산업 라인 등 무중단과 데이터 격리가 필수적인 환경에 적용됩니다. 외부 검증되지 않은 블록의 무단 접근을 완화하고, 자체 블록을 독립 격리하여 안전성을 확보합니다.
+* **보급 및 비용 검증 트랙 (단일 통합형)** — 단가 절감 및 일괄 제조·구동 수율 검증을 위해 활용됩니다.
+* **생존 및 보안 현장 트랙 (조립 분리형)** — 데이터 센터, 자율주행, 산업 라인, EV 교환 스테이션, 재난 대피 인프라 등 무중단과 데이터/물리 격리가 필수적인 환경에 적용됩니다. 외부 검증되지 않은 블록의 무단 접근을 완화하고, 자체 블록을 독립 격리하여 안전성을 확보합니다.
 
 ---
 
 ## 3. 조립형 아키텍처의 핵심 상호호환 논리
 
-* **고성능 구성** — 핵심 제어 본체 블록 + 고성능 외부 연산 가속 블록 (TL Bridge 연결) → 최고 성능 확보
-* **범용·우회 구성** — 외부 가속 블록 이탈/장애 시 내장 백업 연산 블록으로 연산 바통 이행 → 시스템 무중단 유지 및 원가 최적화
+* **고성능 구성** — 핵심 제어 본체 블록 + 고성능 외부 연산 가속/구동 블록 (TL Bridge 연결) → 최고 성능 확보
+* **범용·우회 구성** — 외부 가속/구동 블록 이탈/장애 시 내장 백업 연산/구동 블록으로 연산 및 제어 바통 이행 → 시스템 무중단 유지 및 원가 최적화
 
-**핵심은 TL Bridge와 제어 OS 레이어의 표준화입니다.** TL Bridge가 전원/클럭을 독립 분리하고, 개별 자율 통제, 팀 자체 통제, 중간 관리자, 수평 P2P, 또는 중앙 관제를 통해 블록 상태를 상태 검증으로 파악하므로, 메인보드 및 소프트웨어 구조 수정 없이 요구사항에 따라 연산 블록만 선택적으로 착탈 및 교체할 수 있습니다.
+**핵심은 TL Bridge와 제어 OS 레이어의 표준화입니다.** TL Bridge가 전원/클럭/제어를 독립 분리하고, 개별 자율 통제, 팀 자체 통제, 중간 관리자, 수평 P2P, 또는 중앙 관제를 통해 블록 상태를 상태 검증으로 파악하므로, 메인보드 및 소프트웨어/기구 구조 수정 없이 요구사항에 따라 연산 및 기능 블록만 선택적으로 착탈 및 교체할 수 있습니다.
 
 ---
 
@@ -50,19 +60,19 @@
 
 ## 5. 현재 관측되는 아키텍처 수렴 현상
 
-시장에서는 외부 고성능 연산 블록과의 협력을 확대함과 동시에, 자체 연산 및 제어 블록으로의 전환을 병행하는 흐름이 관측됩니다. 이는 단일 구조에 의존하지 않고 **단일형과 조립형을 동시에 교차 검증하는 '이중 조립 전략'**의 단계적 증거입니다.
+시장에서는 외부 고성능 연산 및 구동 블록과의 협력을 확대함과 동시에, 자체 연산 및 제어 블록으로의 전환을 병행하는 흐름이 관측됩니다. 이는 단일 구조에 의존하지 않고 **단일형과 조립형을 동시에 교차 검증하는 '이중 조립 전략'**의 단계적 증거입니다.
 
 ---
 
-## 6. 구현 수단 무관 범용 구조 및 다층 제어 포괄 (soma-moa 로드맵 v3.2.4)
+## 6. 구현 수단 무관 범용 구조 및 다층 제어 포괄 (soma-moa 로드맵 v3.4)
 
-본 규격은 특정 하드웨어 위치나 단일 제어 알고리즘에 국한되지 않으며, **"기능 모듈 분리 및 상태 검증을 통한 이상 격리 및 자가치유"**라는 범용 구조적 목적을 달성하는 모든 기술적 수단 및 제어 토폴로지를 동일한 선행기술 범주로 포괄 정의합니다.
+본 규격은 특정 하드웨어 위치나 단일 제어 알고리즘에 국한되지 않으며, **"기능 모듈 분리 및 상태 검증을 통한 이상 격리 및 자가치유"**라는 범용 구조적 목적을 달성하는 모든 기술적 수단, 물리 구동체 및 제어 토폴로지를 동일한 선행기술 범주로 포괄 정의합니다.
 
 * **실체적 하드웨어 구현체 연계 (Physical Implementation Reference)**
-  * 본 범용 생존 아키텍처의 대표적인 물리적·기구적 상위 구현체 예시로서 **CWP 4대 하드웨어 메커니즘(`CWP-Entry`, `CWP-Rolling-Self-Align-Battery-Swap-System`, `CWP-Battery-Swap`, `CWP-Clamping-Battery-Swap-System`)** 및 연산 생존 제어기인 **`chiplet-apu-multi-system-survival-architecture`**를 선행기술로서 상호 참조한다.
+  * 본 범용 생존 아키텍처의 대표적인 물리적·기구적 상위 구현체 예시로서 **CWP 4대 하드웨어 메커니즘(`CWP-Entry`, `CWP-Rolling-Self-Align-Battery-Swap-System`, `CWP-Battery-Swap`, `CWP-Clamping-Battery-Swap-System`)** 및 연산 생존 제어기인 **`chiplet-apu-multi-system-survival-architecture`**를 선행기술로서 상호 참조한다. (배터리 팩 및 500kg 이상 범용 중량 모듈 공통 적용)
 
 * **실행 계층 무관성 (Layer-Agnostic Architecture)**
-  * **하드웨어 계층** — 마이크로코드, 펌웨어(FW), 메모리 컨트롤러, IOMMU/MMU, TL Bridge 로직.
+  * **하드웨어 계층** — 마이크로코드, 펌웨어(FW), 메모리 컨트롤러, IOMMU/MMU, TL Bridge 로직, 물리 기구 클러치.
   * **시스템 소프트웨어 계층** — OS 커널, 커널 드라이버, 인터럽트 핸들러, 하이퍼바이저, 스케줄러.
   * **메모리/자원 제어 계층** — 메모리 격리, 페이지 테이블 기반 격리, DMA 버퍼 검증, 레지스터 락.
   * **상위 소프트웨어/AI 계층** — SW 에이전트, AI 가속기, AI 에이전트 간 동적 신뢰도 투표 오케스트레이션.
@@ -72,7 +82,7 @@
 
 * **제어 토폴로지 및 단위 무관성 (Topology & Unit-Agnostic Control)**
   * **개별 노드 자율 통제 (Autonomous Individual Control)** — 외부 통제기 개입 없이 개별 칩렛·모듈 단독으로 내적 이상 판단 시 자가 격리, 전원 감쇄, 또는 최소 기능 모드로 전환하는 구조.
-  * **팀 내부 자체 통제 (Team-Level Self-Control)** — 특정 $M$개 연산 블록 서브 그룹(팀) 내부에서 전역 제어기 개입 없이 1차 자율적 결함 탐지, 팀 내 노드 상호 검증, 및 국소 바이패스를 실행하는 구조.
+  * **팀 내부 자체 통제 (Team-Level Self-Control)** — 특정 $M$개 연산/제어 블록 서브 그룹(팀) 내부에서 전역 제어기 개입 없이 1차 자율적 결함 탐지, 팀 내 노드 상호 검증, 및 국소 바이패스를 실행하는 구조.
   * **중간 관리자 제어 (Intermediate / Domain Manager Control)** — 복수의 팀 또는 클러스터 상위에 위치하는 중간 제어 주체(Domain Controller, Sub-System Manager)가 팀 간 자원을 오케스트레이션하고 2차 범주 격리를 통제하는 구조.
   * **중앙 관리 관제 (Central Orchestrative Management)** — 중앙 관리 컨트롤러, 하이퍼바이저, 중앙 PMIC 등 중앙 집중형 주체가 전역 신뢰도 검증 및 최종 자원 재할당을 승인하는 구조.
   * **수평적 P2P 피어 통제 (Horizontal Peer-to-Peer Control)** — 동일 계층의 인접 블록들이 수평 통신하여 이상 노드를 상호 배제하거나 대리 연산을 수행하는 구조.
@@ -97,15 +107,19 @@
 
 ---
 
-## 8. 출처 (Sources)
+## 8. 출처 및 기록 (Sources & Records)
 
-* **공식 원안 권리자:** deundeuni (`soma-moa`)
-* **최상위 관문:** `somamoa.ai.kr` (Canonical Gateway)
-* **공식 저장소:** GitHub - `soma-moa / ARCHITECTURE_STRATEGY.md` (커밋 해시 및 타임스탬프 기준)
-* **연계 APU 저장소:** GitHub - `deundeuni / chiplet-apu-multi-system-survival-architecture`
-* **연계 CWP 저장소 1:** GitHub - `deundeuni / CWP-Entry`
-* **연계 CWP 저장소 2:** GitHub - `deundeuni / CWP-Rolling-Self-Align-Battery-Swap-System`
-* **연계 CWP 저장소 3:** GitHub - `deundeuni / CWP-Battery-Swap`
-* **연계 CWP 저장소 4:** GitHub - `deundeuni / CWP-Clamping-Battery-Swap-System`
-* **적용 라이선스:** CC BY 4.0 & DPL v1.0 (Defensive Patent License v1.0)
-* **기술적 기반 참조 표준:** UCIe, CXL, TL-UL 등 모듈러 Interconnect 오픈 표준을 참조한 생존형 확장 규격
+* **소마모아 생태계 저장소 및 학술 식별자 (Ecosystem Repositories & DOIs)**
+  * 상위 범용 생존 아키텍처 & APU 연산 제어기 (`chiplet-apu-multi-system-survival-architecture`) — GitHub: `deundeuni / chiplet-apu-multi-system-survival-architecture` | CERN Zenodo DOI: `10.5281/zenodo.22374987` (https://doi.org/10.5281/zenodo.22374987)
+  * 재난 피난 유도 & 보조 인프라 (`LAST-LIGHT`) — GitHub: `deundeuni / LAST-LIGHT` | CERN Zenodo DOI: `10.5281/zenodo.22373189` (https://doi.org/10.5281/zenodo.22373189)
+  * CWP 진입 유도 정렬 (`CWP-Entry`) — GitHub: `deundeuni / CWP-Entry`
+  * CWP 배터리 교환 도킹 (`CWP-Battery-Swap`) — CERN Zenodo DOI: `10.5281/zenodo.22373538` (https://doi.org/10.5281/zenodo.22373538)
+  * CWP 전자기 클램핑 (`CWP-Clamping-Battery-Swap-System`) — CERN Zenodo DOI: `10.5281/zenodo.22373722` (https://doi.org/10.5281/zenodo.22373722)
+  * CWP 롤링 셀프얼라인 (`CWP-Rolling-Self-Align-Battery-Swap-System`) — CERN Zenodo DOI: `10.5281/zenodo.22373704` (https://doi.org/10.5281/zenodo.22373704)
+  * 최상위 거점 관문 및 메인 저장소 (`soma-moa`) — GitHub: `deundeuni / soma-moa` | 관문 도메인: `somamoa.ai.kr`
+
+* **법적 근거 및 선사용권 규정 (Legal Statutes & Precedents)**
+  * 대한민국 특허법 제103조 — 선사용에 의한 통상실시권
+  * 미국 특허법 35 U.S.C. §273 — Defense to Infringement Based on Prior Commercial Use
+  * 적용 라이선스: CC BY 4.0 & DPL v1.0 (Defensive Patent License v1.0)
+  * 기술적 기반 참조 표준: UCIe, CXL, TL-UL 등 모듈러 Interconnect 오픈 표준을 참조한 생존형 확장 규격
