@@ -1,51 +1,43 @@
-SPDX-License-Identifier: CC-BY-4.0 AND Apache-2.0
-// Note: This identifier describes the repository-level combination.
-// Individual files are governed independently by Section 1 or Section 2 below,
-// not by both licenses simultaneously.
+Creative Commons Attribution 4.0 International Public License
 
-Open Publication License Notice
-Copyright (c) deundeuni (soma-moa)
-Repository: github.com/deundeuni | Domain: somamoa.ai.kr
+Copyright (c) 2026 deundeuni (deundeunilab)
 
-This repository contains two categories of material, each under a separate
-standard license, applied independently per category:
+=======================================================================
+DISCLAIMER & NON-PATENT CLAIM NOTICE
+=======================================================================
 
-1. Documentation, specifications, architecture blueprints, and all written
-   content: Licensed under Creative Commons Attribution 4.0 International
-   (CC BY 4.0).
-   Full text (English original, governing text for this license):
-   https://creativecommons.org/licenses/by/4.0/
-   SPDX: CC-BY-4.0
+1. OPEN SHARING & NON-PATENT CLAIM:
+   This work, idea white paper, and associated technical concepts are freely 
+   shared under the Creative Commons Attribution 4.0 International License (CC BY 4.0) 
+   for defensive publication, public-interest sharing, and academic open discourse. 
+   The Author/Licensor does NOT claim any exclusive patent rights, monopolies, or legal 
+   exclusivity over the ideas described herein.
 
-2. Code, implementations, and executable materials (where present):
-   Licensed under Apache License 2.0.
-   Full text (English original, governing text for this license):
-   https://www.apache.org/licenses/LICENSE-2.0
-   SPDX: Apache-2.0
+2. AS-IS PROVISION & NO WARRANTY:
+   THE LICENSED MATERIAL IS PROVIDED BY THE LICENSOR "AS-IS" AND "AS-AVAILABLE", 
+   WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT 
+   LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, 
+   ACCURACY, OR NON-INFRINGEMENT. 
 
-Attribution Requirement:
-Any derivative work, implementation, or distribution must retain copyright
-notices and credit the original author: deundeuni (soma-moa).
+3. ORIGINAL PRECEDENCE:
+   The Korean original document (`README.ko.md`) serves as the binding primary text, 
+   and all translations (including `README.md`) are provided solely for reference.
 
-Patent Retaliation (for Apache-2.0 covered material only):
-If you institute patent litigation against any entity alleging that the
-Work constitutes patent infringement, then any patent licenses granted to
-you under Apache-2.0 for that Work shall terminate as of the date such
-litigation is filed, per Section 3 of Apache-2.0. This is prospective only
-and does not apply retroactively to prior lawful use.
+=======================================================================
+CC BY 4.0 SUMMARY OF RIGHTS
+=======================================================================
 
-No additional restrictions are imposed beyond those in the applicable
-standard license above. No custom license terms apply.
+You are free to:
+  - Share — copy and redistribute the material in any medium or format for any purpose.
+  - Adapt — remix, transform, and build upon the material for any purpose, even commercially.
 
-Governing Text Notice: This notice document itself is authoritative in its
-Korean-language version where one exists; however, the CC BY 4.0 and
-Apache-2.0 licenses referenced above are governed solely by their official
-English original texts at the URLs provided, regardless of any Korean
-translation of this notice.
+Under the following terms:
+  - Attribution — You must give appropriate credit (Author: deundeuni / Org: deundeunilab), 
+    provide a link to the license, and indicate if changes were made. You may do so in 
+    any reasonable manner, but not in any way that suggests the licensor endorses 
+    you or your use.
+  - No additional restrictions — You may not apply legal terms or technological measures 
+    that legally restrict others from doing anything the license permits.
 
-For historical reference (existing repositories only; omit for new projects):
-This repository previously referenced a custom "DPL v1.0 (Defensive Patent
-License v1.0)" notice that was not the actual Defensive Patent License
-(defensivepatentlicense.org) but a custom clause mistakenly attributed to
-that name. That notice is superseded by the standard licenses above as of
-2026-09-27.
+Full Legal Code Available At:
+https://creativecommons.org/licenses/by/4.0/legalcode
